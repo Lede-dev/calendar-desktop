@@ -1,7 +1,7 @@
 package net.ledestudio.calendar.utils
 
 import com.google.gson.GsonBuilder
-import net.ledestudio.calendar.utils.serializer.ZonedDateTimeSerializer
+import net.ledestudio.calendar.serializer.ZonedDateTimeSerializer
 import java.io.File
 import java.nio.charset.StandardCharsets
 import java.time.ZonedDateTime
