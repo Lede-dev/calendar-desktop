@@ -1,8 +1,8 @@
 package net.ledestudio.calendar
 
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.application
@@ -28,7 +28,7 @@ fun main() = application {
 
     // setup window state
     val state = rememberWindowState(
-        size = DpSize(Dp(1200.0F), Dp(800.0F)),
+        size = DpSize(1200.dp, 800.dp),
         position = WindowPosition(Alignment.Center)
     )
 
