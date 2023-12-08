@@ -1,5 +1,6 @@
 package net.ledestudio.calendar.data
 
+import net.ledestudio.calendar.utils.ZonedDateTimeKR
 import java.time.ZonedDateTime
 import java.util.UUID
 
@@ -9,4 +10,40 @@ data class CalendarEvent(
     var expireAt: ZonedDateTime,
     var title: String,
     var contents: List<String>
-)
+) {
+    companion object {
+        fun builder() = CalendarEventBuilder()
+    }
+}
+
+class CalendarEventBuilder {
+
+    private val uuid = UUID.randomUUID()
+    private var startAt: ZonedDateTime = ZonedDateTimeKR.now()
+    private var expireAt: ZonedDateTime = ZonedDateTimeKR.now()
+    private var title = "이름을 입력해 주세요"
+    private var contents = mutableListOf<String>()
+
+    fun startAt(startAt: ZonedDateTime): CalendarEventBuilder {
+        this.startAt = startAt
+        return this
+    }
+
+    fun expireAt(expireAt: ZonedDateTime): CalendarEventBuilder {
+        this.expireAt = expireAt;
+        return this
+    }
+
+    fun title(title: String): CalendarEventBuilder {
+        this.title = title;
+        return this;
+    }
+
+    fun contents(contents: List<String>): CalendarEventBuilder {
+        this.contents = contents.toMutableList()
+        return this;
+    }
+
+    fun build() = CalendarEvent(uuid, startAt, expireAt, title, contents)
+
+}
