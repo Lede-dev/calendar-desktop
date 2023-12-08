@@ -1,4 +1,4 @@
-package net.ledestudio.data
+package net.ledestudio.calendar.data
 
 import java.time.ZonedDateTime
 

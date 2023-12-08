@@ -1,4 +1,4 @@
-package net.ledestudio.utils
+package net.ledestudio.calendar.utils
 
 import com.google.gson.GsonBuilder
 import java.io.File

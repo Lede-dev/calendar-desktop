@@ -1,4 +1,4 @@
-package net.ledestudio
+package net.ledestudio.calendar
 
 import androidx.compose.material.MaterialTheme
 import androidx.compose.desktop.ui.tooling.preview.Preview
