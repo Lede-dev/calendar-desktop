@@ -2,12 +2,16 @@ package net.ledestudio.calendar.utils
 
 import java.time.ZoneId
 import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 
 object ZonedDateTimeKR {
 
     private val zoneId = ZoneId.of("Asia/Seoul")
+    private val formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd - HH:mm:ss Z")
 
     fun zoneId(): ZoneId = zoneId
+
+    fun formatter(): DateTimeFormatter = formatter
 
     fun now(): ZonedDateTime = ZonedDateTime.now(zoneId)
 
