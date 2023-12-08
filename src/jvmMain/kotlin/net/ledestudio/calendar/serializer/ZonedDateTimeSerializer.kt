@@ -1,4 +1,4 @@
-package net.ledestudio.calendar.utils.serializer
+package net.ledestudio.calendar.serializer
 
 import com.google.gson.*
 import net.ledestudio.calendar.utils.ZonedDateTimeKR
