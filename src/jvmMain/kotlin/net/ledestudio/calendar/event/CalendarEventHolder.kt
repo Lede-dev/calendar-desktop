@@ -1,0 +1,25 @@
+package net.ledestudio.calendar.event
+
+import net.ledestudio.calendar.data.CalendarEvent
+import java.time.ZonedDateTime
+import java.util.*
+
+interface CalendarEventHolder {
+
+    fun getEventById(uuid: UUID): CalendarEvent
+
+    fun getEventsInDay(day: ZonedDateTime): List<CalendarEvent>
+
+    fun getEventsBetweenDays(start: ZonedDateTime, expire: ZonedDateTime): List<CalendarEvent>
+
+    fun getEvents()
+
+    fun addEvent(event: CalendarEvent)
+
+    fun removeEvent(event: CalendarEvent)
+
+    fun removeEvent(uuid: UUID)
+
+    fun clearEvents()
+
+}
