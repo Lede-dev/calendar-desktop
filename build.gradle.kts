@@ -16,6 +16,11 @@ repositories {
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
 }
 
+dependencies {
+    // https://mvnrepository.com/artifact/com.google.code.gson/gson
+    commonMainImplementation("com.google.code.gson:gson:2.10.1")
+}
+
 kotlin {
     jvm {
         compilations.all {
