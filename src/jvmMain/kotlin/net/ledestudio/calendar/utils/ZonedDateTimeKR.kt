@@ -35,4 +35,13 @@ object ZonedDateTimeKR {
 
     fun ZonedDateTime.isInRange(first: ZonedDateTime, second: ZonedDateTime): Boolean =
         this.isEqual(first) || this.isEqual(second) || this.isAfter(first) || this.isBefore(second)
+
+    fun serialize(time: ZonedDateTime): String {
+        return time.format(formatter)
+    }
+
+    fun deserialize(str: String): ZonedDateTime {
+        return ZonedDateTime.parse(str, formatter)
+    }
+
 }
