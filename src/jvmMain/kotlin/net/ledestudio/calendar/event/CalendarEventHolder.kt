@@ -12,7 +12,7 @@ interface CalendarEventHolder {
 
     fun getEventsBetweenDays(start: ZonedDateTime, expire: ZonedDateTime): List<CalendarEvent>
 
-    fun getEvents()
+    fun getEvents(): List<CalendarEvent>
 
     fun addEvent(event: CalendarEvent)
 
