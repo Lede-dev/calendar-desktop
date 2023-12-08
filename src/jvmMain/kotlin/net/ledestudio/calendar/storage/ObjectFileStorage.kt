@@ -12,4 +12,8 @@ interface ObjectFileStorage<T> {
 
     fun load(): List<T>
 
+    fun delete(name: String)
+
+    fun clear()
+
 }

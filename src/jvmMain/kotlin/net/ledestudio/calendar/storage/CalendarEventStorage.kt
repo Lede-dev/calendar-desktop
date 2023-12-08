@@ -6,6 +6,7 @@ import net.ledestudio.calendar.utils.GsonReadWrite.writeObject
 import java.io.File
 import java.nio.file.Path
 import kotlin.io.path.createDirectories
+import kotlin.io.path.deleteIfExists
 import kotlin.io.path.notExists
 
 class CalendarEventStorage(private val dirPath: Path): ObjectFileStorage<CalendarEvent> {
@@ -20,8 +21,17 @@ class CalendarEventStorage(private val dirPath: Path): ObjectFileStorage<Calenda
         return dirPath
     }
 
+    override fun save(name: String, obj: CalendarEvent) {
+        getFile(name).also {
+            if (!it.exists()) {
+                it.createNewFile()
+            }
+            it.writeObject(obj)
+        }
+    }
+
     override fun load(name: String): CalendarEvent {
-        File(dirPath.toString(), "$name.json").also {
+        getFile(name).also {
             if (!it.exists()) {
                 it.createNewFile()
             }
@@ -37,12 +47,14 @@ class CalendarEventStorage(private val dirPath: Path): ObjectFileStorage<Calenda
         return eventList
     }
 
-    override fun save(name: String, obj: CalendarEvent) {
-        File(dirPath.toString(), "$name.json").also {
-            if (!it.exists()) {
-                it.createNewFile()
-            }
-            it.writeObject(obj)
-        }
+    override fun delete(name: String) {
+        getFile(name).also { it.delete() }
     }
+
+    override fun clear() {
+        dirPath.toFile().listFiles()?.filterNotNull()?.forEach { it.delete() }
+    }
+
+    private fun getFile(name: String): File = File(dirPath.toString(), "$name.json")
+
 }
