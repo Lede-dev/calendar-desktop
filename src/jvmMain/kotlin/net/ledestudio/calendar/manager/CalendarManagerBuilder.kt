@@ -8,10 +8,11 @@ class CalendarManagerBuilder {
 
     private val manager = CalendarManagerImpl()
 
-    fun initCalendarEventHolder() {
+    fun initCalendarEventHolder(): CalendarManagerBuilder {
         val storage = CalendarEventStorage(Path.of(""))
         val holder = CalendarEventHolderImpl(storage)
         manager.setCalendarEventHolder(holder)
+        return this
     }
 
     fun build() = manager
