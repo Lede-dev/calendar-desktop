@@ -19,6 +19,12 @@ repositories {
 dependencies {
     // https://mvnrepository.com/artifact/com.google.code.gson/gson
     commonMainImplementation("com.google.code.gson:gson:2.10.1")
+
+    // https://mvnrepository.com/artifact/org.jetbrains.compose.material3/material3-desktop
+    commonMainImplementation("org.jetbrains.compose.material3:material3-desktop:1.5.11")
+
+    // https://mvnrepository.com/artifact/org.jetbrains.skiko/skiko-awt-runtime-windows-x64
+    commonMainImplementation("org.jetbrains.skiko:skiko-awt-runtime-windows-x64:0.7.77")
 }
 
 kotlin {
