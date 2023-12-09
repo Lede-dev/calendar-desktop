@@ -12,7 +12,7 @@ import androidx.compose.ui.unit.dp
 object LineDivider {
 
     @Composable
-    private fun VerticalDivider(color: Color = Color.White, thickness: Dp = 1.dp) {
+    fun VerticalDivider(color: Color = Color.White, thickness: Dp = 1.dp) {
         Divider(
             color = color,
             modifier = Modifier.fillMaxHeight().width(thickness)
@@ -20,7 +20,7 @@ object LineDivider {
     }
 
     @Composable
-    private fun HorizontalDivider(color: Color = Color.White, thickness: Dp = 1.dp) {
+    fun HorizontalDivider(color: Color = Color.White, thickness: Dp = 1.dp) {
         Divider(
             color = color,
             thickness = thickness
