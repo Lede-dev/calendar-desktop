@@ -8,6 +8,7 @@ object Colors {
     val navIcon = fromHex("#00FF00")
 
     val calendarBackground = fromHex("#222222")
+    val calendarTitleBackground = fromHex("#111111")
     val calendarContent = fromHex("#333333")
     val calendarSepLine = fromHex("#555555")
     val calendarContentText = fromHex("#CCCCCC")

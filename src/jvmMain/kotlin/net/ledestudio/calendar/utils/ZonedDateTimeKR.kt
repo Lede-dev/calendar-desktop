@@ -1,5 +1,7 @@
 package net.ledestudio.calendar.utils
 
+import java.time.Instant
+import java.time.LocalDate
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
@@ -42,6 +44,12 @@ object ZonedDateTimeKR {
 
     fun deserialize(str: String): ZonedDateTime {
         return ZonedDateTime.parse(str, formatter)
+    }
+
+    fun getLocalDateFromEpochMillis(millis: Long?): LocalDate {
+        return Instant.ofEpochMilli(millis ?: 0)
+            .atZone(ZonedDateTimeKR.zoneId())
+            .toLocalDate()
     }
 
 }
