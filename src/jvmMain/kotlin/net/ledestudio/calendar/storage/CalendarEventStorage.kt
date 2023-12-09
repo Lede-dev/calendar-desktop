@@ -6,7 +6,6 @@ import net.ledestudio.calendar.utils.GsonReadWrite.writeObject
 import java.io.File
 import java.nio.file.Path
 import kotlin.io.path.createDirectories
-import kotlin.io.path.deleteIfExists
 import kotlin.io.path.notExists
 
 class CalendarEventStorage(private val dirPath: Path): ObjectFileStorage<CalendarEvent> {

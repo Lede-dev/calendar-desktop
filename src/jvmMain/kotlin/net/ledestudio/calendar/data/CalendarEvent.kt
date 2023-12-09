@@ -2,7 +2,7 @@ package net.ledestudio.calendar.data
 
 import net.ledestudio.calendar.utils.ZonedDateTimeKR
 import java.time.ZonedDateTime
-import java.util.UUID
+import java.util.*
 
 data class CalendarEvent(
     val uuid: UUID,
