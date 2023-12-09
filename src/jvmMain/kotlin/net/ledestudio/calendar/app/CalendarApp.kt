@@ -1,6 +1,7 @@
 package net.ledestudio.calendar.app
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -16,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -162,30 +164,75 @@ object CalendarApp {
                 .clip(shape = RoundedCornerShape(10.dp))
                 .background(Colors.navBackground)
         ) {
+            Column(
+                modifier = Modifier.fillMaxSize()
+                    //.background(Color.Red)
+            ) {
+                // Weeks
+                WeekTextRow(163.dp)
 
+                HorizontalDivider()
+
+                // Calendar
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        //.background(Color.Green)
+                )
+            }
         }
     }
 
-
-    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    fun BottomSheetDatePicker(
-        state: DatePickerState,
-        sheetState: SheetState = rememberModalBottomSheetState(),
-        onDismissRequest: () -> Unit
-    ) {
-        ModalBottomSheet(
-            onDismissRequest = onDismissRequest,
-            sheetState = sheetState,
-            dragHandle = { BottomSheetDefaults.DragHandle() },
+    private fun WeekTextRow(width: Dp) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(0.07F)
         ) {
-            DatePicker(
-                state = state,
-                showModeToggle = false,
-                title = null,
-                headline = null
-            )
+            WeekText("Sun", width)
+            VerticalDivider()
+            WeekText("Mon", width)
+            VerticalDivider()
+            WeekText("Tue", width)
+            VerticalDivider()
+            WeekText("Wed", width)
+            VerticalDivider()
+            WeekText("Thu", width)
+            VerticalDivider()
+            WeekText("Fri", width)
+            VerticalDivider()
+            WeekText("Sat", width)
         }
+    }
+
+    @Composable
+    private fun WeekText(text: String, width: Dp) {
+        Text(
+            modifier = Modifier
+                .fillMaxHeight()
+                .width(width), //.background(Color.Blue),
+            text = text,
+            textAlign = TextAlign.Center,
+            fontSize = 30.sp,
+            color = Colors.navIcon
+        )
+    }
+
+    @Composable
+    private fun VerticalDivider(color: Color = Color.White, thickness: Dp = 1.dp) {
+        Divider(
+            color = color,
+            modifier = Modifier.fillMaxHeight().width(thickness)
+        )
+    }
+
+    @Composable
+    private fun HorizontalDivider(color: Color = Color.White, thickness: Dp = 1.dp) {
+        Divider(
+            color = color,
+            thickness = thickness
+        )
     }
 
 }
