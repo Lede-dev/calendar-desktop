@@ -1,18 +1,18 @@
 package net.ledestudio.calendar.app
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.grid.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ExitToApp
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -21,8 +21,13 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import net.ledestudio.calendar.CalendarDesktop
 import net.ledestudio.calendar.utils.Colors
 import net.ledestudio.calendar.utils.ZonedDateTimeKR
+import java.time.DayOfWeek
+import java.time.Instant
+import java.time.YearMonth
+import java.time.ZonedDateTime
 import kotlin.system.exitProcess
 
 
@@ -32,12 +37,9 @@ object CalendarApp {
     @Preview
     @Composable
     fun App() {
-        val datePickerState = rememberDatePickerState()
-        if (datePickerState.selectedDateMillis == null) {
-            // kst 오차 반영
-            val kstDiff = 9 * 60 * 60 * 1000
-            datePickerState.setSelection(ZonedDateTimeKR.now().toInstant().toEpochMilli() + kstDiff)
-        }
+        val datePickerState = rememberDatePickerState(
+            initialSelectedDateMillis = Instant.now().toEpochMilli() + (9 * 60 * 60 * 1000) // kst +9
+        )
 
         Column(modifier = Modifier.fillMaxSize()) {
 
@@ -67,14 +69,14 @@ object CalendarApp {
             )
 
             // calendar title
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight(0.1F)
-                    .background(Colors.calendarBackground)
-            ) {
-                CalendarTitle(datePickerState)
-            }
+//            Box(
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .fillMaxHeight(0.1F)
+//                    .background(Colors.calendarBackground)
+//            ) {
+//                CalendarTitle(datePickerState)
+//            }
 
             // calendar content
             Box(
@@ -83,7 +85,8 @@ object CalendarApp {
                     .fillMaxHeight(1.0F)
                     .background(Colors.calendarBackground)
             ) {
-                CalendarBody()
+                // CalendarBody(datePickerState)
+                CalendarContentGrid(datePickerState)
             }
         }
     }
@@ -155,8 +158,9 @@ object CalendarApp {
 
     }
 
+    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    private fun CalendarBody() {
+    private fun CalendarBody(datePickerState: DatePickerState) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -169,16 +173,12 @@ object CalendarApp {
                     //.background(Color.Red)
             ) {
                 // Weeks
-                WeekTextRow(163.dp)
+                WeekTextRow(width = 163.dp)
 
                 HorizontalDivider()
 
                 // Calendar
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        //.background(Color.Green)
-                )
+                CalendarContentGrid(datePickerState)
             }
         }
     }
@@ -232,6 +232,106 @@ object CalendarApp {
         Divider(
             color = color,
             thickness = thickness
+        )
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    private fun CalendarContentGrid(datePickerState: DatePickerState) {
+        val selectedDate = ZonedDateTimeKR.getLocalDateFromEpochMillis(datePickerState.selectedDateMillis)
+
+        val zonedDateTime = ZonedDateTimeKR.of(selectedDate)
+        val events = CalendarDesktop.getManager().getCalendarEventHolder().getEventsInDay(zonedDateTime)
+
+        val eventsAmountText = if (events.isNotEmpty()) " (${events.size})" else ""
+        val title = "${selectedDate.year}년 ${selectedDate.monthValue}월 ${selectedDate.dayOfMonth}일" + eventsAmountText
+
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
+
+            Surface(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(40.dp),
+                shape = RoundedCornerShape(10.dp),
+                color = Color.White
+            ) {
+                DatePicker(
+                    state = datePickerState,
+                    showModeToggle = false,
+                    title = {
+                        Row {
+                            Box(modifier = Modifier.width(30.dp))
+
+                            Text(
+                                modifier = Modifier
+                                    .wrapContentSize()
+                                    .padding(0.dp, 30.dp, 0.dp, 0.dp),
+                                text = title,
+                                textAlign = TextAlign.Center,
+                                fontSize = 45.sp,
+                            )
+
+                            Box(modifier = Modifier.width(30.dp))
+
+                            IconButton(
+                                modifier = Modifier
+                                    .wrapContentSize()
+                                    .padding(0.dp, 35.dp, 0.dp, 0.dp),
+                                onClick = {}
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Edit,
+                                    contentDescription = "Edit Event",
+                                    modifier = Modifier.size(55.dp)
+                                )
+                            }
+                        }
+                    },
+                    headline = null
+                )
+            }
+
+//            LazyVerticalGrid(
+//                columns = GridCells.Fixed(7),
+//                verticalArrangement = Arrangement.spacedBy(1.dp),
+//                horizontalArrangement = Arrangement.spacedBy(1.dp)
+//            ) {
+//                val yearMonth = YearMonth.of(selectedDate.year, selectedDate.monthValue)
+//                val firstDayOfWeek = yearMonth.atDay(1).dayOfWeek
+//                val lastDayOfWeek = yearMonth.atEndOfMonth().dayOfWeek
+//
+////                val data = mutableListOf<ZonedDateTime?>()
+////                if (firstDayOfWeek != DayOfWeek.SUNDAY) {
+////                    for (i in 1 .. (firstDayOfWeek.value)) {
+////                        data.add(null)
+////                    }
+////                }
+////
+////                for (i in 1..selectedDate.da)
+////
+////
+////                for (i in 1..42) {
+////                    data.add(ZonedDateTimeKR.now())
+////                }
+////
+////                // items(data) { item -> CalendarContent(item) }
+////                itemsIndexed(items = listOf("1")) {index, day ->
+////
+////                }
+//
+//            }
+        }
+    }
+
+    @Composable
+    private fun CalendarContent(date: ZonedDateTime) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Cyan)
         )
     }
 
