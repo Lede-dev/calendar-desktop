@@ -37,7 +37,6 @@ fun main() = application {
         title = "Calendar Desktop",
         onCloseRequest = ::exitApplication,
         state = state,
-        undecorated = true,
         resizable = false
     ) {
         CalendarApp.App()
