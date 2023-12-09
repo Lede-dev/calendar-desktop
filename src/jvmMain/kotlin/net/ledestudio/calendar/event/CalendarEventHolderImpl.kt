@@ -24,7 +24,7 @@ class CalendarEventHolderImpl(private val storage: ObjectFileStorage<CalendarEve
     }
 
     override fun getEvents(): List<CalendarEvent> {
-        return storage.load()
+        return storage.load().sortedWith(compareBy { it.title })
     }
 
     override fun addEvent(event: CalendarEvent) {
