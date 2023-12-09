@@ -15,7 +15,7 @@ class CalendarEventHolderImpl(private val storage: ObjectFileStorage<CalendarEve
 
     override fun getEventsInDay(day: ZonedDateTime): List<CalendarEvent> {
         val start = of(day.year, day.monthValue, day.dayOfMonth)
-        val end = of(day.year, day.monthValue, day.dayOfMonth + 1)
+        val end = of(day.year, day.monthValue, day.dayOfMonth, 23, 59)
         return getEventsBetweenDays(start, end)
     }
 
