@@ -2,6 +2,7 @@ package net.ledestudio.calendar.utils
 
 import java.time.Instant
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
@@ -23,6 +24,8 @@ object ZonedDateTimeKR {
     fun of(year: Int, month: Int, day: Int, hour:Int, minute: Int): ZonedDateTime =
         ZonedDateTime.of(year, month, day, hour, minute, 0, 0, zoneId)
 
+    fun of(dateTime: LocalDateTime): ZonedDateTime = ZonedDateTime.of(dateTime, zoneId)
+
     fun checkCross(
         firstStartTime: ZonedDateTime,
         firstExpireTime: ZonedDateTime,
@@ -36,7 +39,7 @@ object ZonedDateTimeKR {
     }
 
     fun ZonedDateTime.isInRange(first: ZonedDateTime, second: ZonedDateTime): Boolean =
-        this.isEqual(first) || this.isEqual(second) || this.isAfter(first) || this.isBefore(second)
+        (this.isEqual(first) || this.isAfter(first)) && (this.isEqual(second) || this.isBefore(second))
 
     fun serialize(time: ZonedDateTime): String {
         return time.format(formatter)
@@ -46,10 +49,10 @@ object ZonedDateTimeKR {
         return ZonedDateTime.parse(str, formatter)
     }
 
-    fun getLocalDateFromEpochMillis(millis: Long?): LocalDate {
+    fun getLocalDateFromEpochMillis(millis: Long?): LocalDateTime {
         return Instant.ofEpochMilli(millis ?: 0)
-            .atZone(ZonedDateTimeKR.zoneId())
-            .toLocalDate()
+            .atZone(zoneId())
+            .toLocalDateTime()
     }
 
 }
