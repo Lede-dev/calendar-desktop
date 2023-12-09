@@ -20,6 +20,11 @@ interface CalendarEventHolder {
 
     fun removeEvent(uuid: UUID)
 
+    fun updateEvent(event: CalendarEvent) {
+        removeEvent(event)
+        addEvent(event)
+    }
+
     fun clearEvents()
 
 }
