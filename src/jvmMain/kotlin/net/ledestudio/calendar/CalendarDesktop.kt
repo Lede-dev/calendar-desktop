@@ -125,9 +125,7 @@ fun addEvent() {
     readlnOrNull()?.let { builder.title(it) }
 
     println("이벤트 시작 시간을 입력하세요 (년 월 일 시 분 띄어쓰기로 구분).")
-    readlnOrNull()?.let {
-        readlnOrNull()?.let { builder.startAt(readZonedDateTime(it)) }
-    }
+    readlnOrNull()?.let { builder.startAt(readZonedDateTime(it)) }
 
     println("이벤트 종료 시간을 입력하세요 (년 월 일 시 분 띄어쓰기로 구분).")
     readlnOrNull()?.let  {builder.expireAt(readZonedDateTime(it)) }
