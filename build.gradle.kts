@@ -4,6 +4,7 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 plugins {
     kotlin("multiplatform")
     id("org.jetbrains.compose")
+    id("com.github.johnrengelman.shadow") version "4.0.4"
 }
 
 group = "net.ledestudio"
@@ -53,3 +54,15 @@ compose.desktop {
         }
     }
 }
+
+tasks {
+    named<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJar") {
+        archiveBaseName.set("shadow")
+        mergeServiceFiles()
+        manifest {
+            attributes(mapOf("Main-Class" to "net.ledestudio.calendar.CalendarDesktopKt"))
+        }
+    }
+}
+
+
