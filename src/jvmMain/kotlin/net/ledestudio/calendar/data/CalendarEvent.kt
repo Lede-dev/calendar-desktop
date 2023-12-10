@@ -2,6 +2,7 @@ package net.ledestudio.calendar.data
 
 import net.ledestudio.calendar.utils.ZonedDateTimeKR
 import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 data class CalendarEvent(
@@ -13,6 +14,15 @@ data class CalendarEvent(
 ) {
     companion object {
         fun builder() = CalendarEventBuilder()
+    }
+
+    fun print() {
+        println("=================================")
+        println("[제목]: $title")
+        println("[기간]: $startAt ~ $expireAt")
+        println("[상세]:")
+        contents.forEach { println(it) }
+        println("=================================")
     }
 }
 
