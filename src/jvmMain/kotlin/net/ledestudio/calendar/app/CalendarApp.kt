@@ -1,8 +1,7 @@
 package net.ledestudio.calendar.app
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
-import androidx.compose.foundation.background
-import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -12,21 +11,17 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.*
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import net.ledestudio.calendar.CalendarDesktop
+import net.ledestudio.calendar.data.CalendarEvent
 import net.ledestudio.calendar.utils.Colors
 import net.ledestudio.calendar.utils.ZonedDateTimeKR
-import java.time.DayOfWeek
 import java.time.Instant
-import java.time.YearMonth
 import java.time.ZonedDateTime
 import kotlin.system.exitProcess
 
@@ -68,16 +63,6 @@ object CalendarApp {
                 }
             )
 
-            // calendar title
-//            Box(
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .fillMaxHeight(0.1F)
-//                    .background(Colors.calendarBackground)
-//            ) {
-//                CalendarTitle(datePickerState)
-//            }
-
             // calendar content
             Box(
                 modifier = Modifier
@@ -85,172 +70,170 @@ object CalendarApp {
                     .fillMaxHeight(1.0F)
                     .background(Colors.calendarBackground)
             ) {
-                // CalendarBody(datePickerState)
-                CalendarContentGrid(datePickerState)
+                CalendarContent(datePickerState)
             }
         }
     }
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    private fun CalendarTitle(datePickerState: DatePickerState) {
-        var sheetState by remember{ mutableStateOf(false) }
+    private fun CalendarContent(datePickerState: DatePickerState) {
+
+        // initialize states
         val selectedDate = ZonedDateTimeKR.getLocalDateFromEpochMillis(datePickerState.selectedDateMillis)
+        val zonedDateTime = ZonedDateTimeKR.of(selectedDate)
 
-        // calendar title
+        var sheetState by remember{ mutableStateOf(false) }
+        var eventDialogState by remember { mutableStateOf(false) }
+
+        val events = CalendarDesktop.getManager().getCalendarEventHolder().getEventsInDay(zonedDateTime)
+        val calendarEvents by remember { mutableStateOf(events.toMutableList()) }
+
+        // create calendar box
+        CalendarBox(
+            zonedDateTime = zonedDateTime,
+            datePickerState = datePickerState,
+            getCalendarEvents = {
+                calendarEvents.clear()
+                calendarEvents.addAll(CalendarDesktop.getManager().getCalendarEventHolder().getEventsInDay(zonedDateTime))
+                calendarEvents
+            },
+            updateSheetState = { newState -> sheetState = newState }
+        )
+
+        // create event dialog
+        CalendarEventDialog(
+            zonedDateTime = zonedDateTime,
+            getSheetState = { sheetState },
+            getEventDialogState = { eventDialogState },
+            updateCalendarEvents = {
+                calendarEvents.clear()
+                calendarEvents.addAll(CalendarDesktop.getManager().getCalendarEventHolder().getEventsInDay(zonedDateTime))
+                calendarEvents
+            },
+            updateSheetState = { newState -> sheetState = newState },
+            updateEventDialogState = { newState -> eventDialogState = newState }
+        )
+
+    }
+
+    @Composable
+    private fun CalendarEventDetailButton(
+        event: CalendarEvent,
+        eventDialogState: () -> Boolean,
+        updateEventDialogState: (Boolean) -> Unit,
+        updateSheetState: (Boolean) -> Unit,
+        updateCalendarEvents: () -> MutableList<CalendarEvent>
+    ) {
+        var title = event.title
+        if (title.length > 65) {
+            title = title.substring(0, 65) + "..."
+        }
+
         IconButton(
-            onClick = { sheetState = true },
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(350.dp, 10.dp, 350.dp, 0.dp)
-                // .background(Color.Red)
+            onClick = { updateEventDialogState(true) },
+            modifier = Modifier.fillMaxSize()
         ) {
-            Row {
+            Box(
+                modifier = Modifier.padding(0.dp, 15.dp, 0.dp, 0.dp)
+            ) {
                 Text(
                     modifier = Modifier
-                        .fillMaxHeight()
-                        .width(200.dp)
-                        .clip(shape = RoundedCornerShape(10.dp))
-                        .background(Colors.calendarTitleBackground),
-                    text = "${selectedDate.year}",
-                    textAlign = TextAlign.Center,
-                    fontSize = 42.sp,
-                    color = Colors.navIcon
-                )
-
-                Box(modifier = Modifier.fillMaxHeight().width(50.dp))
-
-                Text(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .width(200.dp)
-                        .clip(shape = RoundedCornerShape(10.dp))
-                        .background(Colors.calendarTitleBackground),
-                    text = "${selectedDate.month.value}",
-                    textAlign = TextAlign.Center,
-                    fontSize = 42.sp,
-                    color = Colors.navIcon
+                        .height(40.dp)
+                        .fillMaxWidth()
+                        .padding(15.dp, 0.dp, 15.dp, 0.dp),
+                    text = title,
+                    fontSize = 17.sp,
+                    color = Color.White,
                 )
             }
         }
 
-        // calendar dialog and select date
-        if (sheetState) {
+        if (eventDialogState.invoke()) {
             Dialog(
-                onDismissRequest = {sheetState = false},
+                onDismissRequest = { updateEventDialogState(false) },
+                properties = DialogProperties(usePlatformDefaultWidth = false)
             ) {
                 Surface(
                     modifier = Modifier
-                        .fillMaxSize()
-                        .padding(40.dp),
+                        .fillMaxHeight()
+                        .width(1000.dp)
+                        .padding(80.dp),
                     shape = RoundedCornerShape(10.dp),
                     color = Color.White
                 ) {
-                    DatePicker(
-                        state = datePickerState,
-                        showModeToggle = false,
-                        title = null,
-                        headline = null
-                    )
+                    Column(
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+
+                        // header
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .fillMaxHeight(0.05F)
+                                .background(Colors.navBackground)
+                        ) {
+                            IconButton(
+                                onClick = {
+                                    CalendarDesktop.getManager().getCalendarEventHolder().removeEvent(event)
+                                    updateCalendarEvents()
+                                    updateEventDialogState(false)
+                                    updateSheetState(false)
+                                    updateSheetState(true)
+                                },
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Delete,
+                                    contentDescription = "Delete",
+                                    modifier = Modifier.size(25.dp),
+                                    tint = Colors.navIcon
+                                )
+                            }
+
+                            Box(modifier = Modifier.fillMaxWidth(0.95F))
+
+                            IconButton(
+                                onClick = {
+                                    // contents
+                                    event.title = "타이틀 업데이트 완료"
+
+                                    CalendarDesktop.getManager().getCalendarEventHolder().updateEvent(event)
+                                    updateCalendarEvents()
+                                    updateEventDialogState(false)
+                                    updateSheetState(false)
+                                    updateSheetState(true)
+                                },
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Done,
+                                    contentDescription = "Save",
+                                    modifier = Modifier.size(25.dp),
+                                    tint = Colors.navIcon
+                                )
+                            }
+                        }
+                    }
                 }
             }
         }
-
     }
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    private fun CalendarBody(datePickerState: DatePickerState) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(20.dp, 10.dp, 20.dp, 20.dp)
-                .clip(shape = RoundedCornerShape(10.dp))
-                .background(Colors.navBackground)
-        ) {
-            Column(
-                modifier = Modifier.fillMaxSize()
-                    //.background(Color.Red)
-            ) {
-                // Weeks
-                WeekTextRow(width = 163.dp)
-
-                HorizontalDivider()
-
-                // Calendar
-                CalendarContentGrid(datePickerState)
-            }
-        }
-    }
-
-    @Composable
-    private fun WeekTextRow(width: Dp) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(0.07F)
-        ) {
-            WeekText("Sun", width)
-            VerticalDivider()
-            WeekText("Mon", width)
-            VerticalDivider()
-            WeekText("Tue", width)
-            VerticalDivider()
-            WeekText("Wed", width)
-            VerticalDivider()
-            WeekText("Thu", width)
-            VerticalDivider()
-            WeekText("Fri", width)
-            VerticalDivider()
-            WeekText("Sat", width)
-        }
-    }
-
-    @Composable
-    private fun WeekText(text: String, width: Dp) {
-        Text(
-            modifier = Modifier
-                .fillMaxHeight()
-                .width(width), //.background(Color.Blue),
-            text = text,
-            textAlign = TextAlign.Center,
-            fontSize = 30.sp,
-            color = Colors.navIcon
-        )
-    }
-
-    @Composable
-    private fun VerticalDivider(color: Color = Color.White, thickness: Dp = 1.dp) {
-        Divider(
-            color = color,
-            modifier = Modifier.fillMaxHeight().width(thickness)
-        )
-    }
-
-    @Composable
-    private fun HorizontalDivider(color: Color = Color.White, thickness: Dp = 1.dp) {
-        Divider(
-            color = color,
-            thickness = thickness
-        )
-    }
-
-    @OptIn(ExperimentalMaterial3Api::class)
-    @Composable
-    private fun CalendarContentGrid(datePickerState: DatePickerState) {
-        val selectedDate = ZonedDateTimeKR.getLocalDateFromEpochMillis(datePickerState.selectedDateMillis)
-
-        val zonedDateTime = ZonedDateTimeKR.of(selectedDate)
-        val events = CalendarDesktop.getManager().getCalendarEventHolder().getEventsInDay(zonedDateTime)
-
+    private fun CalendarBox(
+        zonedDateTime: ZonedDateTime,
+        datePickerState: DatePickerState,
+        getCalendarEvents: () -> List<CalendarEvent>,
+        updateSheetState: (Boolean) -> Unit
+    ) {
+        val events = getCalendarEvents.invoke()
         val eventsAmountText = if (events.isNotEmpty()) " (${events.size})" else ""
-        val title = "${selectedDate.year}년 ${selectedDate.monthValue}월 ${selectedDate.dayOfMonth}일" + eventsAmountText
+        val title = "${zonedDateTime.year}년 ${zonedDateTime.monthValue}월 ${zonedDateTime.dayOfMonth}일" + eventsAmountText
 
         Box(
             modifier = Modifier
                 .fillMaxSize()
         ) {
-
             Surface(
                 modifier = Modifier
                     .fillMaxSize()
@@ -280,7 +263,7 @@ object CalendarApp {
                                 modifier = Modifier
                                     .wrapContentSize()
                                     .padding(0.dp, 35.dp, 0.dp, 0.dp),
-                                onClick = {}
+                                onClick = { updateSheetState(true) }
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Edit,
@@ -293,46 +276,100 @@ object CalendarApp {
                     headline = null
                 )
             }
-
-//            LazyVerticalGrid(
-//                columns = GridCells.Fixed(7),
-//                verticalArrangement = Arrangement.spacedBy(1.dp),
-//                horizontalArrangement = Arrangement.spacedBy(1.dp)
-//            ) {
-//                val yearMonth = YearMonth.of(selectedDate.year, selectedDate.monthValue)
-//                val firstDayOfWeek = yearMonth.atDay(1).dayOfWeek
-//                val lastDayOfWeek = yearMonth.atEndOfMonth().dayOfWeek
-//
-////                val data = mutableListOf<ZonedDateTime?>()
-////                if (firstDayOfWeek != DayOfWeek.SUNDAY) {
-////                    for (i in 1 .. (firstDayOfWeek.value)) {
-////                        data.add(null)
-////                    }
-////                }
-////
-////                for (i in 1..selectedDate.da)
-////
-////
-////                for (i in 1..42) {
-////                    data.add(ZonedDateTimeKR.now())
-////                }
-////
-////                // items(data) { item -> CalendarContent(item) }
-////                itemsIndexed(items = listOf("1")) {index, day ->
-////
-////                }
-//
-//            }
         }
     }
 
     @Composable
-    private fun CalendarContent(date: ZonedDateTime) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.Cyan)
-        )
+    private fun CalendarEventDialog(
+        zonedDateTime: ZonedDateTime,
+        getSheetState: () -> Boolean,
+        getEventDialogState: () -> Boolean,
+        updateCalendarEvents: () -> MutableList<CalendarEvent>,
+        updateSheetState: (Boolean) -> Unit,
+        updateEventDialogState: (Boolean) -> Unit
+    ) {
+        if (getSheetState.invoke()) {
+            Dialog(
+                onDismissRequest = { updateSheetState(false) },
+                properties = DialogProperties(usePlatformDefaultWidth = false)
+            ) {
+                Surface(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .width(1200.dp)
+                        .padding(60.dp),
+                    shape = RoundedCornerShape(10.dp),
+                    color = Color.White
+                ) {
+                    Column(
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .fillMaxHeight(0.06F)
+                                .background(Colors.navBackground)
+                        ) {
+
+                            // create event
+                            IconButton(
+                                onClick = {
+                                    val newEvent = CalendarEvent.builder()
+                                        .startAt(zonedDateTime)
+                                        .expireAt(zonedDateTime)
+                                        .build()
+                                    CalendarDesktop.getManager().getCalendarEventHolder().addEvent(newEvent)
+                                    updateCalendarEvents()
+                                    updateSheetState(false)
+                                    updateSheetState(true)
+                                }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.AddCircle,
+                                    contentDescription = "Add Event",
+                                    modifier = Modifier.size(25.dp),
+                                    tint = Colors.navIcon
+                                )
+                            }
+
+                            Box(modifier = Modifier.fillMaxWidth(0.95F))
+
+                            IconButton(
+                                onClick = { updateSheetState(false) },
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.ExitToApp,
+                                    contentDescription = "Exit Dialog",
+                                    modifier = Modifier.size(25.dp),
+                                    tint = Colors.navIcon
+                                )
+                            }
+                        }
+
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(Colors.calendarBackground)
+                                .verticalScroll(rememberScrollState())
+                        ) {
+                            updateCalendarEvents.invoke().forEach { event ->
+                                CalendarEventDetailButton(
+                                    event = event,
+                                    eventDialogState = getEventDialogState,
+                                    updateEventDialogState = updateEventDialogState,
+                                    updateSheetState = updateSheetState,
+                                    updateCalendarEvents = updateCalendarEvents
+                                )
+
+                                LineDivider.HorizontalDivider()
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
+
 
 }
