@@ -21,24 +21,24 @@ object CalendarDesktop {
 
 }
 
-fun main() = application {
-    // setup calendar manager
-    val manager = CalendarManager.builder().initCalendarEventHolder().build()
-    CalendarDesktop.setManager(manager)
-
-    // setup window state
-    val state = rememberWindowState(
-        size = DpSize(1200.dp, 800.dp),
-        position = WindowPosition(Alignment.Center)
-    )
-
-    // create and start app
-    Window(
-        title = "Calendar Desktop",
-        onCloseRequest = ::exitApplication,
-        state = state,
-        resizable = false
-    ) {
-        CalendarApp.App()
-    }
-}
+//fun main() = application {
+//    // setup calendar manager
+//    val manager = CalendarManager.builder().initCalendarEventHolder().build()
+//    CalendarDesktop.setManager(manager)
+//
+//    // setup window state
+//    val state = rememberWindowState(
+//        size = DpSize(1200.dp, 800.dp),
+//        position = WindowPosition(Alignment.Center)
+//    )
+//
+//    // create and start app
+//    Window(
+//        title = "Calendar Desktop",
+//        onCloseRequest = ::exitApplication,
+//        state = state,
+//        resizable = false
+//    ) {
+//        CalendarApp.App()
+//    }
+//}
