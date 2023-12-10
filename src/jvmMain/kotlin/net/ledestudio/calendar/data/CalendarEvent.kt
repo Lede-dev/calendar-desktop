@@ -2,7 +2,6 @@ package net.ledestudio.calendar.data
 
 import net.ledestudio.calendar.utils.ZonedDateTimeKR
 import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter
 import java.util.*
 
 data class CalendarEvent(
