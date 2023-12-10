@@ -56,19 +56,23 @@ fun main() {
 
     var exit = true
     while (exit) {
-        println("메뉴 번호를 선택하세요 (1:종료, 2:조회, 3:이벤트 추가, 4:이벤트 조회, 5:이벤트 제거, 6:이벤트 수정, 7:이벤트 검색).")
-        when(readlnOrNull()?.let { CalendarCommand.getByNum(it.toInt()) }) {
-            CalendarCommand.EXIT -> {
-                println("캘린더 종료.")
-                exit = false
+        try {
+            println("메뉴 번호를 선택하세요 (1:종료, 2:조회, 3:이벤트 추가, 4:이벤트 조회, 5:이벤트 제거, 6:이벤트 수정, 7:이벤트 검색).")
+            when(readlnOrNull()?.let { CalendarCommand.getByNum(it.toInt()) }) {
+                CalendarCommand.EXIT -> {
+                    println("캘린더 종료.")
+                    exit = false
+                }
+                CalendarCommand.DISPLAY -> displayCalendar()
+                CalendarCommand.EVENT_ADD -> addEvent()
+                CalendarCommand.EVENT_DISPLAY -> displayEvent()
+                CalendarCommand.EVENT_DELETE -> deleteEvent()
+                CalendarCommand.EVENT_EDIT -> editEvent()
+                CalendarCommand.EVENT_SEARCH -> searchEvent()
+                else -> println("잘못된 메뉴 번호를 입력하였습니다.")
             }
-            CalendarCommand.DISPLAY -> displayCalendar()
-            CalendarCommand.EVENT_ADD -> addEvent()
-            CalendarCommand.EVENT_DISPLAY -> displayEvent()
-            CalendarCommand.EVENT_DELETE -> deleteEvent()
-            CalendarCommand.EVENT_EDIT -> editEvent()
-            CalendarCommand.EVENT_SEARCH -> searchEvent()
-            else -> println("잘못된 메뉴 번호를 입력하였습니다.")
+        } catch (ex: Exception) {
+            ex.printStackTrace()
         }
     }
 }
